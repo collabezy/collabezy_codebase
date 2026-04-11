@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Influencer Brand Collab</title>
-  <script type="module" crossorigin src="/assets/admin_dashboard-q_UrxTV-.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/style-BMUfA7TY.js">
-  <link rel="modulepreload" crossorigin href="/assets/adminApi-CzFO3A5q.js">
-  <link rel="stylesheet" crossorigin href="/assets/style-CO-q1XwB.css">
+    <title>Admin Dashboard - Collabezy</title>
+    <link rel="icon" type="image/png" href="./cezy2-1.png">
+  <script type="module" crossorigin src="./assets/admin_dashboard-OUKbf_IH.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/style-BqVZ4CSq.js">
+  <link rel="modulepreload" crossorigin href="./assets/adminApi-CKNIlaRm.js">
+  <link rel="stylesheet" crossorigin href="./assets/style-CJaI28KQ.css">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -17,10 +18,11 @@
             <p class="subtitle mb-6" id="admin-info">System Administrator</p>
             
             <ul class="sidebar-nav">
-                <li><a href="#" class="active" id="nav-overview">Overview</a></li>
-                <li><a href="#influencers" id="nav-influencers">Influencers</a></li>
-                <li><a href="#brands" id="nav-brands">Brands</a></li>
-                <li><a href="#tickets-section" id="nav-tickets">Active Deals</a></li>
+                <li><a href="#" class="active" id="nav-overview" onclick="showSection('overview')">Overview</a></li>
+                <li><a href="#influencers" id="nav-influencers" onclick="showSection('influencers')">Influencers</a></li>
+                <li><a href="#brands" id="nav-brands" onclick="showSection('brands')">Brands</a></li>
+                <li><a href="#tickets-section" id="nav-tickets" onclick="showSection('tickets-section')">Active Deals</a></li>
+                <li><a href="#instagram-verification" id="nav-instagram" onclick="showSection('instagram-verification')">Instagram Verification</a></li>
                 <li><a href="#" id="logout-btn" style="color: var(--error);">Logout</a></li>
             </ul>
         </aside>
@@ -35,27 +37,29 @@
             </div>
 
             <!-- Metrics Summary -->
-            <div class="feature-grid mb-12">
-                <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-                    <p class="subtitle">Influencers</p>
-                    <h2 id="total-influencers" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
+            <section id="overview" class="section active">
+                <div class="feature-grid mb-12">
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <p class="subtitle">Influencers</p>
+                        <h2 id="total-influencers" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
+                    </div>
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <p class="subtitle">Brands</p>
+                        <h2 id="total-brands" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
+                    </div>
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <p class="subtitle">Promotion Requests</p>
+                        <h2 id="total-campaigns" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
+                    </div>
+                    <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                        <p class="subtitle">Active Deals</p>
+                        <h2 id="total-tickets" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
+                    </div>
                 </div>
-                <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-                    <p class="subtitle">Brands</p>
-                    <h2 id="total-brands" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
-                </div>
-                <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-                    <p class="subtitle">Promotion Requests</p>
-                    <h2 id="total-campaigns" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
-                </div>
-                <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
-                    <p class="subtitle">Active Deals</p>
-                    <h2 id="total-tickets" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
-                </div>
-            </div>
+            </section>
 
             <!-- Tickets Table Section -->
-            <section id="tickets-section" class="glass-panel mb-12" style="padding: 2rem; max-width: 100%; overflow-x: auto;">
+            <section id="tickets-section" class="section glass-panel mb-12" style="padding: 2rem; max-width: 100%; overflow-x: auto;">
                 <h2 class="mb-4">Active Collaboration Deals</h2>
                 <table class="admin-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
@@ -74,8 +78,27 @@
                 </table>
             </section>
 
+            <!-- Instagram Verification Table Section -->
+            <section id="instagram-verification" class="section glass-panel mb-12" style="padding: 2rem; max-width: 100%; overflow-x: auto;">
+                <h2 class="mb-4">Instagram Verification Requests</h2>
+                <table class="admin-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <th style="padding: 1rem;">Influencer</th>
+                            <th style="padding: 1rem;">Channel Name</th>
+                            <th style="padding: 1rem;">Link</th>
+                            <th style="padding: 1rem;">Verification Code</th>
+                            <th style="padding: 1rem;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="instagram-verification-tbody">
+                        <tr><td colspan="5" style="text-align: center; padding: 2rem;" class="subtitle">Loading requests...</td></tr>
+                    </tbody>
+                </table>
+            </section>
+
             <!-- Influencer Table Section -->
-            <section id="influencers" class="glass-panel mb-12" style="padding: 2rem; max-width: 100%; overflow-x: auto;">
+            <section id="influencers" class="section glass-panel mb-12" style="padding: 2rem; max-width: 100%; overflow-x: auto;">
                 <h2 class="mb-4">Influencer Management</h2>
                 <table class="admin-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
@@ -93,7 +116,7 @@
             </section>
 
             <!-- Brand Table Section -->
-            <section id="brands" class="glass-panel mb-12" style="padding: 2rem; max-width: 100%; overflow-x: auto;">
+            <section id="brands" class="section glass-panel mb-12" style="padding: 2rem; max-width: 100%; overflow-x: auto;">
                 <h2 class="mb-4">Brand Management</h2>
                 <table class="admin-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
@@ -122,7 +145,21 @@
         .status-pill { padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.1); }
         .status-yes { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: #10b981; }
         .status-no { background: rgba(239, 68, 68, 0.1); color: #ef4444; border-color: #ef4444; }
+        .section { display: none; }
+        .section.active { display: block; }
     </style>
+
+    <script>
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.classList.add('active');
+                document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+            }
+        }
+        showSection('overview');
+    </script>
 
 </body>
 </html>

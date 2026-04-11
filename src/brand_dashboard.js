@@ -148,8 +148,8 @@ function renderCampaigns(campaigns) {
         let statusColor = campaign.status === 'active' ? '#10b981' : '#f59e0b';
         
         el.innerHTML = `
-            <div class="flex-between mb-4">
-                <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <div class="flex-between mb-4" style="flex-wrap: wrap; gap: 0.5rem;">
+                <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                     <h3 style="font-size: 1.25rem;">${campaign.product_name}</h3>
                     ${platformTag}
                 </div>

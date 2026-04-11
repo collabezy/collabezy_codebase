@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email - Collabezy</title>
+  <link rel="icon" type="image/png" href="/cezy2-1.png">
+    <link rel="stylesheet" href="/src/style.css">
+  <style>
+    .verify-container {
+      max-width: 400px;
+      margin: 4rem auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    .otp-inputs {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+    .otp-input {
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      text-align: center;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-main);
+      outline: none;
+    }
+    .otp-input:focus {
+      border-color: var(--primary);
+    }
+    .resend-link {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+    .resend-link a {
+      color: var(--primary);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar glass-panel">
+    <div class="nav-content">
+      <a href="/" class="title small-title">Collabezy</a>
+    </div>
+  </nav>
+
+  <div class="glass-panel verify-container">
+    <h1 class="mb-4">Verify Your Email</h1>
+    <p class="subtitle mb-4">We've sent a verification code to<br><strong id="user-email"></strong></p>
+    
+    <div class="otp-inputs">
+      <input type="text" class="otp-input" maxlength="1" id="otp1" autofocus>
+      <input type="text" class="otp-input" maxlength="1" id="otp2">
+      <input type="text" class="otp-input" maxlength="1" id="otp3">
+      <input type="text" class="otp-input" maxlength="1" id="otp4">
+      <input type="text" class="otp-input" maxlength="1" id="otp5">
+      <input type="text" class="otp-input" maxlength="1" id="otp6">
+    </div>
+    
+    <button class="btn btn-primary" style="width: 100%;" id="verify-btn">Verify Email</button>
+    
+    <p class="resend-link">Didn't receive the code? <a id="resend-btn">Resend</a></p>
+    
+    <p id="message" class="mt-4" style="display: none;"></p>
+  </div>
+
+  <script type="module">
+    import { insforge } from '/src/lib/insforge.js';
+    
+    const email = sessionStorage.getItem('pending_verification_email');
+    if (!email) {
+      window.location.href = '/auth.html';
+    }
+    document.getElementById('user-email').textContent = email;
+    
+    const otpInputs = ['otp1','otp2','otp3','otp4','otp5','otp6'];
+    otpInputs.forEach((id, i) => {
+      const input = document.getElementById(id);
+      input.addEventListener('input', (e) => {
+        if (e.target.value && i < 5) {
+          document.getElementById(otpInputs[i+1]).focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && i > 0) {
+          document.getElementById(otpInputs[i-1]).focus();
+        }
+      });
+    });
+    
+    document.getElementById('verify-btn').addEventListener('click', async () => {
+      const code = otpInputs.map(id => document.getElementById(id).value).join('').trim();
+      if (code.length !== 6) {
+        showMessage('Please enter the 6-digit code', 'error');
+        return;
+      }
+      
+      console.log('Verifying with email:', email, 'code:', code);
+      
+      try {
+        // Try as a number (without string quotes)
+        const { data, error } = await insforge.auth.verifyEmail(Number(code));
+        if (error) {
+          console.log('Error with Number:', error);
+          // Try plain string
+          const { data: d2, error: e2 } = await insforge.auth.verifyEmail(code);
+          console.log('Retry response:', d2, e2);
+          if (e2) throw e2;
+          return;
+        }
+        console.log('Verify response:', data, error);
+        
+        sessionStorage.removeItem('pending_verification_email');
+        
+        const role = sessionStorage.getItem('pending_role');
+        if (role === 'BRAND') {
+          window.location.href = '/brand_setup.html';
+        } else {
+          window.location.href = '/dashboard.html';
+        }
+      } catch (err) {
+        showMessage(err.message || 'Invalid code', 'error');
+      }
+    });
+    
+    document.getElementById('resend-btn').addEventListener('click', async () => {
+      try {
+        await insforge.auth.resendVerificationEmail({ email });
+        showMessage('Code resent! Check your email.', 'success');
+      } catch (err) {
+        showMessage(err.message, 'error');
+      }
+    });
+    
+    function showMessage(msg, type) {
+      const el = document.getElementById('message');
+      el.textContent = msg;
+      el.className = `mt-4 ${type}`;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

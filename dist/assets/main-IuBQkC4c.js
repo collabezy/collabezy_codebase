@@ -1,0 +1,1 @@
+import"./style-BqVZ4CSq.js";window.addEventListener(`DOMContentLoaded`,()=>{console.log(`Landing page loaded successfully.`)});

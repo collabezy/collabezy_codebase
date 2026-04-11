@@ -116,15 +116,17 @@ form.addEventListener('submit', async (e) => {
 
       if (error) throw error;
 
-      // Handle sign up success
-      if (data.user && !data.requireEmailVerification) {
-          showMessage('Account created successfully!', 'success');
-          
+      if (data.requireEmailVerification) {
+          sessionStorage.setItem('pending_verification_email', email);
+          sessionStorage.setItem('pending_role', 'INFLUENCER');
+          showMessage('Verification email sent! Redirecting...', 'success');
           setTimeout(() => {
-            window.location.href = '/dashboard.html';
-          }, 1000);
-      } else if (data.user) {
-          showMessage('Signup successful! Please check your email to verify.', 'success');
+            window.location.href = '/verify_email.html';
+          }, 500);
+      } else {
+          sessionStorage.setItem('pending_verification_email', email);
+          sessionStorage.setItem('pending_role', 'INFLUENCER');
+          window.location.href = '/dashboard.html';
       }
     }
   } catch (err) {

@@ -22,7 +22,8 @@ export default defineConfig({
         deal_detail: resolve(__dirname, 'deal_detail.html'),
         admin_dashboard: resolve(__dirname, 'admin_dashboard.html'),
         admin_influencer_detail: resolve(__dirname, 'admin_influencer_detail.html'),
-        admin_brand_detail: resolve(__dirname, 'admin_brand_detail.html')
+        admin_brand_detail: resolve(__dirname, 'admin_brand_detail.html'),
+        verify_email: resolve(__dirname, 'verify_email.html')
       }
     }
   }

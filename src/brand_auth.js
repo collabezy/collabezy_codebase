@@ -120,24 +120,39 @@ form.addEventListener('submit', async (e) => {
         }, 1000);
       }
     } else {
-      const { data, error } = await insforge.auth.signUp({ email, password });
-      if (error) throw error;
+      submitBtn.textContent = 'Creating account...';
+      submitBtn.disabled = true;
+      
+      try {
+        const { data, error } = await insforge.auth.signUp({ email, password });
+        
+        if (error) {
+          showMessage(error.message || 'Signup failed', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign Up';
+          return;
+        }
 
-      if (data.user) {
-          // Explicitly set BRAND role in profiles
-          const { error: roleErr } = await insforge.database
-              .from('profiles')
-              .upsert({ id: data.user.id, role: 'BRAND' });
-              
-          if (!data.requireEmailVerification) {
-              showMessage('Account created successfully!', 'success');
-              setTimeout(() => {
-                window.location.href = '/brand_setup.html';
-              }, 1000);
-          } else {
-              showMessage('Signup successful! Please check your email to verify.', 'success');
-          }
+        console.log('Signup response:', data);
+        
+        if (data.requireEmailVerification) {
+          sessionStorage.setItem('pending_verification_email', email);
+          sessionStorage.setItem('pending_role', 'BRAND');
+          showMessage('Verification email sent! Redirecting...', 'success');
+          setTimeout(() => {
+            window.location.href = '/verify_email.html';
+          }, 500);
+        } else {
+          sessionStorage.setItem('pending_verification_email', email);
+          sessionStorage.setItem('pending_role', 'BRAND');
+          window.location.href = '/brand_setup.html';
+        }
+      } catch (err) {
+        console.error('Signup error:', err);
+        showMessage(err.message || 'An error occurred', 'error');
       }
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign Up';
     }
   } catch (err) {
     showMessage(err.message || 'An error occurred', 'error');

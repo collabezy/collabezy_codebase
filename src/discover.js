@@ -117,6 +117,8 @@ function renderInfluencers() {
         const card = document.createElement('div');
         card.className = 'glass-panel influencer-card';
         card.style.padding = '1.5rem';
+        card.style.cursor = 'pointer';
+        card.onclick = () => window.location.href = `/influencer_detail.html?id=${p.user_id}`;
         card.innerHTML = `
             <div class="flex-between mb-4">
                 <div style="display: flex; align-items: center; gap: 1rem;">
@@ -126,7 +128,7 @@ function renderInfluencers() {
                         <p class="subtitle" style="font-size: 0.85rem;">${(p.category || []).join(', ')}</p>
                     </div>
                 </div>
-                ${isVerified ? '<span style="color: #60a5fa; font-size: 1.2rem;">✔️</span>' : ''}
+                ${isVerified ? '<span style="background: #10b981; color: white; padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 0.7rem; font-weight: bold;">✓</span>' : ''}
             </div>
 
             <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
@@ -154,7 +156,7 @@ function renderInfluencers() {
                 ${p.bio || 'No bio available for this creator.'}
             </p>
 
-            <button class="btn btn-secondary" onclick="window.location.href='/influencer_detail.html?id=${p.user_id}'" style="width: 100%;">View Profile</button>
+            
         `;
         influencerContainer.appendChild(card);
     });
