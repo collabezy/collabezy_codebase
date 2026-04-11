@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencer Profile - Brand Collab</title>
+    <style>
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            object-fit: cover;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: rgba(30, 41, 59, 0.95);
+            margin: 10% auto;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/influencer_detail-a9WZwW9T.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/insforge-gvpOEqFn.js">
+  <link rel="modulepreload" crossorigin href="/assets/style-BMUfA7TY.js">
+  <link rel="modulepreload" crossorigin href="/assets/analytics-Cw2uiPP8.js">
+  <link rel="stylesheet" crossorigin href="/assets/style-CO-q1XwB.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2 class="title" style="font-size: 1.25rem;">Brand Collab</h2>
+            <p class="subtitle mb-4 text-center" style="font-size: 0.8rem; background: rgba(236,72,153,0.1); color: #ec4899; padding: 0.25rem; border-radius: 4px;">BRAND PORTAL</p>
+            <ul class="sidebar-nav">
+                <li><a href="/brand_dashboard.html">Overview</a></li>
+                <li><a href="/discover.html">Discover</a></li>
+                <li><a href="/brand_dashboard.html#promotion-list">My Promotions</a></li>
+                <li><a href="#" id="logout-btn">Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <a href="/discover.html" class="btn btn-link mb-8" style="font-size: 0.9rem; margin-top: -1rem;">← Back to Discover</a>
+
+            <div id="loader" class="text-center mt-20">
+                <p class="subtitle">Fetching profile details...</p>
+            </div>
+
+            <div id="profile-view" style="display: none;">
+                <div class="profile-header">
+                    <img id="profile-avatar" src="" class="profile-avatar">
+                    <div style="flex: 1;">
+                        <div class="flex-between">
+                            <h1 id="profile-name" style="font-size: 2.2rem; margin-bottom: 0.3rem;">Loading...</h1>
+                            <button id="open-request-modal-btn" class="btn btn-primary" style="width: auto; padding: 0.75rem 1.5rem;">Send Collaboration Request</button>
+                        </div>
+                        <p id="profile-categories" class="subtitle" style="font-size: 1.1rem; color: #a78bfa;"></p>
+                    </div>
+                </div>
+
+                <div class="glass-panel mb-8" style="padding: 2rem;">
+                    <h2 class="mb-4">About</h2>
+                    <p id="profile-bio" class="subtitle" style="line-height: 1.6; font-size: 1.05rem;"></p>
+                </div>
+
+                <div class="feature-grid" id="channels-grid">
+                    <!-- Channels will be loaded here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Collaboration Request Modal -->
+    <div id="request-modal" class="modal">
+        <div class="modal-content glass-panel">
+            <div class="flex-between mb-6">
+                <h2 style="font-size: 1.5rem;">New Request</h2>
+                <button id="close-modal-btn" class="btn btn-link" style="padding: 0; color: #ef4444;">✕</button>
+            </div>
+            
+            <form id="collab-request-form">
+                <div class="form-group mb-4">
+                    <label>Select Promotion Request</label>
+                    <select id="request-campaign" required>
+                        <option value="">Choose an active promotion request...</option>
+                    </select>
+                </div>
+                
+                <div class="form-group mb-4">
+                    <label>Message</label>
+                    <textarea id="request-message" rows="4" placeholder="Briefly describe why you want to collaborate..." required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group mb-4">
+                        <label>Budget Offer (₹)</label>
+                        <input type="text" id="request-budget" placeholder="e.g. 50,000">
+                    </div>
+                    <div class="form-group mb-4">
+                        <label>Deadline</label>
+                        <input type="date" id="request-deadline" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <div class="flex-between mt-6">
+                    <button type="submit" id="submit-request-btn" class="btn btn-primary" style="flex:1;">Submit Request</button>
+                    <button type="button" id="cancel-request-btn" class="btn btn-secondary" style="flex:1; margin-left: 0.5rem;">Cancel</button>
+                </div>
+                <p id="request-msg" class="text-center mt-4 mb-2" style="font-size: 0.9rem; display: none;"></p>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
