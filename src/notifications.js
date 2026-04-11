@@ -164,6 +164,9 @@ export async function handleNotificationClick(notificationId, actionUrl, referen
             window.location.href = `/brand_deal_detail.html?id=${referenceId}`;
         } else if (currentPath.includes('collab_') || currentPath.includes('dashboard')) {
             window.location.href = `/deal_detail.html?id=${referenceId}`;
+        } else {
+            // We're on deal detail page, just store the flag
+            sessionStorage.setItem('fromNotification', 'true');
         }
     }
 }

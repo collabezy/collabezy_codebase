@@ -62,21 +62,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     await loadDeals();
-    
-    // Check if we need to open a specific ticket from notification
-    const openTicketId = localStorage.getItem('openTicketId');
-    const fromNotification = localStorage.getItem('fromNotification');
-    if (openTicketId && fromNotification === 'true') {
-        localStorage.removeItem('openTicketId');
-        localStorage.removeItem('fromNotification');
-        console.log('Auto-opening ticket from notification:', openTicketId);
-        // Use setTimeout to ensure the UI is ready
-        setTimeout(() => {
-            openTicket(openTicketId);
-        }, 300);
-    } else {
-        localStorage.removeItem('openTicketId');
-    }
 });
 
 async function loadDeals() {

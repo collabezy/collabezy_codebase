@@ -104,19 +104,9 @@ window.addEventListener('DOMContentLoaded', async () => {
 
     await loadRequests();
     
-    // Check if we need to open a specific ticket from notification
-    const openTicketId = localStorage.getItem('openTicketId');
-    const fromNotification = localStorage.getItem('fromNotification');
-    if (openTicketId && fromNotification === 'true') {
-        localStorage.removeItem('openTicketId');
-        localStorage.removeItem('fromNotification');
-        console.log('Auto-opening ticket from notification:', openTicketId);
-        setTimeout(() => {
-            openTicketDetail(openTicketId);
-        }, 300);
-    } else {
-        localStorage.removeItem('openTicketId');
-    }
+    // Clear stored values - no auto-open modal when leaving detail page
+    localStorage.removeItem('openTicketId');
+    localStorage.removeItem('fromNotification');
 
     initNotifications();
 });

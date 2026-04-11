@@ -92,6 +92,9 @@ async function loadDealDetails(ticketId) {
 
     // Update header
     document.getElementById('deal-product').textContent = promo ? promo.product_name : 'Direct Deal';
+
+    // Render action buttons based on status
+    renderActionButtons(ticket);
     document.getElementById('deal-brand').textContent = brand ? `From: ${brand.brand_name}` : 'Unknown Brand';
 
     // Update product details
@@ -116,8 +119,8 @@ async function loadDealDetails(ticketId) {
     const isBrand = ticket.brand_id === currentUser.id;
     const isInfluencer = ticket.influencer_id === currentUser.id;
 
-    // Show submit work section for influencers if status allows
-    if (isInfluencer && (ticket.status === 'PAYMENT_CONFIRMED' || ticket.status === 'ACCEPTED' || ticket.status === 'WORK_SUBMITTED' || ticket.status === 'CHANGES_REQUESTED')) {
+    // Show submit work section for influencers (not for COMPLETED status)
+    if (isInfluencer && ticket.status !== 'COMPLETED' && (ticket.status === 'PAYMENT_CONFIRMED' || ticket.status === 'ACCEPTED' || ticket.status === 'WORK_SUBMITTED' || ticket.status === 'CHANGES_REQUESTED' || ticket.status === 'PAYMENT_PROOF_SUBMITTED')) {
         document.getElementById('submit-work-section').style.display = 'block';
     }
 
@@ -305,24 +308,22 @@ async function sendMessage() {
     }
 
     const btn = document.getElementById('send-msg-btn');
+    if (btn.disabled) return;
     btn.disabled = true;
     const originalText = btn.textContent;
     btn.textContent = '...';
 
-    const { error } = await insforge.database
-        .from('ticket_messages')
-        .insert([{
-            ticket_id: currentTicket.id,
-            sender_id: currentUser.id,
-            message: text
-        }]);
+    try {
+        const { error } = await insforge.database
+            .from('ticket_messages')
+            .insert([{
+                ticket_id: currentTicket.id,
+                sender_id: currentUser.id,
+                message: text
+            }]);
 
-    btn.disabled = false;
-    btn.textContent = originalText;
+        if (error) throw error;
 
-    if (error) {
-        alert('Error sending message: ' + error.message);
-    } else {
         chatInput.value = '';
         addMessageToChat('You', text, true, new Date().toISOString(), null);
 
@@ -332,6 +333,11 @@ async function sendMessage() {
             message: `💰 You have a new message about your deal`,
             referenceId: currentTicket.id
         });
+    } catch (err) {
+        alert('Error sending message: ' + err.message);
+    } finally {
+        btn.disabled = false;
+        btn.textContent = originalText;
     }
 }
 
@@ -374,11 +380,12 @@ async function submitWork() {
             referenceId: currentTicket.id
         });
 
+        alert('Work submitted successfully!');
         document.getElementById('submission-url').value = '';
         document.getElementById('submission-notes').value = '';
         
-        alert('Work submitted successfully!');
         await loadWorkSubmissions(currentTicket.id);
+        await loadDealDetails(currentTicket.id);
         
     } catch (err) {
         alert('Error: ' + err.message);
@@ -509,5 +516,195 @@ window.submitPaymentProof = async function() {
     } finally {
         btn.disabled = false;
         btn.textContent = 'Submit Payment Proof';
+    }
+};
+
+async function renderActionButtons(ticket) {
+    const container = document.getElementById('action-buttons');
+    container.innerHTML = '';
+
+    switch (ticket.status) {
+        case 'PENDING':
+            container.innerHTML = `
+                <button class="btn btn-primary" onclick="acceptDeal('${ticket.id}')" style="flex:1;">✓ Accept Deal</button>
+                <button class="btn btn-secondary" onclick="rejectDeal('${ticket.id}')" style="flex:1;border-color:#ef4444;color:#ef4444;">✕ Reject Deal</button>
+                <button class="btn btn-secondary" onclick="showCounterOffer()" style="flex:1;border-color:#6366f1;color:#6366f1;">💰 Counter Offer</button>
+            `;
+            break;
+        case 'NEGOTIATION':
+            container.innerHTML = `
+                <button class="btn btn-primary" onclick="acceptDeal('${ticket.id}')" style="flex:1;">✓ Accept Offer</button>
+                <button class="btn btn-secondary" onclick="rejectDeal('${ticket.id}')" style="flex:1;border-color:#ef4444;color:#ef4444;">✕ Reject</button>
+                <button class="btn btn-secondary" onclick="showCounterOffer()" style="flex:1;border-color:#6366f1;color:#6366f1;">💰 Counter Offer</button>
+            `;
+            break;
+        case 'ACCEPTED':
+            container.innerHTML = `<p style="color:#10b981;font-weight:bold;margin:0 auto;">✓ Deal Accepted</p>`;
+            break;
+        case 'REJECTED':
+        case 'CANCELLED':
+            container.innerHTML = `<p style="color:#ef4444;font-weight:bold;margin:0 auto;">✕ Deal ${ticket.status}</p>`;
+            break;
+        case 'PAYMENT_PENDING':
+            container.innerHTML = `<p style="color:#ec4899;font-weight:bold;margin:0 auto;">⏳ Payment Pending from Brand</p>`;
+            break;
+        case 'PAYMENT_PROOF_SUBMITTED':
+        case 'PAYMENT_CONFIRMED':
+            // Check if it's partial payment 1 or full payment
+            const isPartial1 = currentTicket.payment_type === 'partial' && currentTicket.payment_number === 1;
+            if (isPartial1) {
+                container.innerHTML = `
+                    <p style="color:#10b981;font-weight:bold;margin:0 auto;">✓ Payment 1 (Before Work) Received</p>
+                    <button class="btn btn-primary" onclick="showWorkForm()" style="flex:1;margin-top:0.5rem;">📤 Submit Work</button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <p style="color:#10b981;font-weight:bold;margin:0 auto;">✓ Final Payment Received - Deal Completed!</p>
+                `;
+            }
+            break;
+        case 'WORK_SUBMITTED':
+            container.innerHTML = `
+                <p style="color:#a855f7;font-weight:bold;margin:0 auto;">📤 Work Submitted - Waiting for Approval</p>
+                <button class="btn btn-secondary" onclick="showWorkForm()" style="flex:1;margin-top:0.5rem;">Submit Updated Work</button>
+            `;
+            break;
+        case 'CHANGES_REQUESTED':
+            container.innerHTML = `
+                <p style="color:#f59e0b;font-weight:bold;margin:0 auto;">⚠️ Changes Requested</p>
+                <button class="btn btn-primary" onclick="showWorkForm()" style="flex:1;margin-top:0.5rem;">Resubmit Work</button>
+            `;
+            break;
+        case 'COMPLETED':
+            container.innerHTML = `
+                <p style="color:#10b981;font-weight:bold;margin:0 auto;margin-bottom:0.5rem;">✅ Deal Completed!</p>
+                <p style="color:#f59e0b;font-size:0.85rem;">This deal is closed. No further actions needed.</p>
+            `;
+            break;
+        default:
+            container.innerHTML = `<p style="color:#f59e0b;font-weight:bold;margin:0 auto;">Status: ${ticket.status}</p>`;
+    }
+}
+
+window.acceptDeal = async function(ticketId) {
+    if (!confirm('Accept this deal?')) return;
+    
+    try {
+        const { error } = await insforge.database
+            .from('tickets')
+            .update({ status: 'ACCEPTED' })
+            .eq('id', ticketId);
+        
+        if (error) throw error;
+        
+        alert('Deal accepted!');
+        
+        await createNotification({
+            userId: currentTicket.brand_id,
+            type: 'deal_accepted',
+            message: `✓ Your deal has been accepted`,
+            referenceId: ticketId
+        });
+        
+        await loadDealDetails(ticketId);
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+};
+
+window.rejectDeal = async function(ticketId) {
+    if (!confirm('Reject this deal?')) return;
+    
+    try {
+        const { error } = await insforge.database
+            .from('tickets')
+            .update({ status: 'REJECTED' })
+            .eq('id', ticketId);
+        
+        if (error) throw error;
+        
+        alert('Deal rejected.');
+        
+        await createNotification({
+            userId: currentTicket.brand_id,
+            type: 'deal_rejected',
+            message: `✕ Your deal has been declined`,
+            referenceId: ticketId
+        });
+        
+        await loadDealDetails(ticketId);
+    } catch (err) {
+        alert('Error: ' + + err.message);
+    }
+};
+
+window.showCounterOffer = function() {
+    document.getElementById('counter-modal').style.display = 'flex';
+    document.getElementById('counter-amount').value = '';
+    document.getElementById('counter-note').value = '';
+};
+
+window.closeCounterModal = function() {
+    document.getElementById('counter-modal').style.display = 'none';
+};
+
+window.submitCounterOfferFromModal = async function() {
+    const amount = document.getElementById('counter-amount').value.trim();
+    const note = document.getElementById('counter-note').value.trim();
+    
+    if (!amount || isNaN(amount)) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    closeCounterModal();
+    await submitCounterOffer(amount, note);
+};
+
+async function submitCounterOffer(amount, note) {
+    try {
+        const { error } = await insforge.database
+            .from('tickets')
+            .update({ 
+                status: 'NEGOTIATION',
+                proposed_amount: amount
+            })
+            .eq('id', currentTicket.id);
+        
+        if (error) throw error;
+        
+        await insforge.database.from('ticket_messages').insert([{
+            ticket_id: currentTicket.id,
+            sender_id: currentUser.id,
+            message: note ? `Counter offer: ₹${amount} - ${note}` : `Counter offer: ₹${amount}`
+        }]);
+        
+        alert('Counter offer sent!');
+        
+        await createNotification({
+            userId: currentTicket.brand_id,
+            type: 'counter_offer',
+            message: `💰 Counter offer of ₹${amount} received`,
+            referenceId: currentTicket.id
+        });
+        
+        await loadDealDetails(currentTicket.id);
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+window.showWorkForm = function() {
+    const section = document.getElementById('submit-work-section');
+    if (section) {
+        section.style.display = 'block';
+        // Open the expandable content
+        const content = section.querySelector('.expandable-content');
+        if (content) {
+            content.classList.add('show');
+            const toggle = section.querySelector('.expandable-toggle');
+            if (toggle) toggle.classList.add('open');
+        }
+        section.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 };

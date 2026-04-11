@@ -87,6 +87,9 @@ async function loadDealDetails(ticketId) {
     document.getElementById('detail-platform').textContent = promo?.platform || 'Not specified';
     document.getElementById('detail-amount').textContent = ticket.proposed_amount ? `₹ ${ticket.proposed_amount}` : 'Not set';
     
+    // Render action buttons based on status
+    renderBrandActionButtons(ticket);
+    
     const statusEl = document.getElementById('deal-status');
     statusEl.textContent = ticket.status.replace(/_/g, ' ');
     statusEl.className = `status-badge status-${ticket.status.toLowerCase()}`;
@@ -101,20 +104,27 @@ async function loadDealDetails(ticketId) {
         document.getElementById('detail-promo-desc').textContent = promo.description || 'No description.';
     }
 
-    // Show payment upload section for brand
-    if (ticket.status === 'ACCEPTED') {
-        document.getElementById('brand-payment-section').style.display = 'block';
+    // Show payment upload section for brand when deal is active
+    if (ticket.status === 'ACCEPTED' || ticket.status === 'WORK_SUBMITTED' || ticket.status === 'COMPLETED') {
+        // Check if there's remaining payment - only show if payment is pending
+        const totalAmount = parseFloat(ticket.final_amount || ticket.proposed_amount || 0);
+        const { data: existingPayments } = await insforge.database.from('payments').select('amount').eq('ticket_id', ticket.id);
+        const totalPaid = existingPayments?.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0) || 0;
         
-        // Show UPI ID
-        if (influencer?.upi_id) {
-            document.getElementById('influencer-upi-id').textContent = influencer.upi_id;
-        } else {
-            document.getElementById('influencer-upi-id').textContent = 'Not provided';
-        }
+        if (totalPaid < totalAmount) {
+            document.getElementById('brand-payment-section').style.display = 'block';
+            
+            // Show UPI ID
+            if (influencer?.upi_id) {
+                document.getElementById('influencer-upi-id').textContent = influencer.upi_id;
+            } else {
+                document.getElementById('influencer-upi-id').textContent = 'Not provided';
+            }
 
-        // Set default amount
-        document.getElementById('payment-amount-input').value = ticket.final_amount || ticket.proposed_amount || '';
-        document.getElementById('total-amount-display').textContent = `Total Deal Value: ₹${ticket.final_amount || ticket.proposed_amount || '0'}`;
+            // Set default amount
+            document.getElementById('payment-amount-input').value = ticket.final_amount || ticket.proposed_amount || '';
+            document.getElementById('total-amount-display').textContent = `Total Deal Value: ₹${ticket.final_amount || ticket.proposed_amount || '0'}`;
+        }
     }
 
     // Load payment history
@@ -433,3 +443,232 @@ window.addEventListener('beforeunload', () => {
         clearInterval(messagePollInterval);
     }
 });
+
+async function renderBrandActionButtons(ticket) {
+    const container = document.getElementById('action-buttons');
+    container.innerHTML = '';
+
+    switch (ticket.status) {
+        case 'PENDING':
+            container.innerHTML = `
+                <button class="btn btn-secondary" onclick="showCounterOffer()" style="flex:1;border-color:#6366f1;color:#6366f1;">💰 Counter Offer</button>
+            `;
+            break;
+        case 'NEGOTIATION':
+            container.innerHTML = `
+                <button class="btn btn-secondary" onclick="showCounterOffer()" style="flex:1;border-color:#6366f1;color:#6366f1;">💰 Counter Offer</button>
+            `;
+            break;
+        case 'ACCEPTED':
+            container.innerHTML = `<p style="color:#10b981;font-weight:bold;margin:0 auto;">✓ Deal Accepted - Upload Payment</p>`;
+            break;
+        case 'WORK_SUBMITTED':
+            container.innerHTML = `
+                <p style="color:#a855f7;font-weight:bold;margin:0 auto;margin-bottom:0.5rem;">📤 Work Submitted - Review Required</p>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="approveWork()" style="flex:1;">✓ Approve Work</button>
+                    <button class="btn btn-secondary" onclick="showChangeRequest()" style="flex:1;border-color:#f59e0b;color:#f59e0b;">⚠️ Request Changes</button>
+                </div>
+            `;
+            break;
+        case 'PAYMENT_PROOF_SUBMITTED':
+            // Check existing payments to determine if this is partial 1 or full payment
+            const totalAmount = parseFloat(ticket.final_amount || ticket.proposed_amount || 0);
+            const { data: payments } = await insforge.database.from('payments').select('amount').eq('ticket_id', ticket.id);
+            const totalPaid = payments?.reduce((sum, p) => sum + parseFloat(p.amount || 0), 0) || 0;
+            
+            if (totalPaid >= totalAmount) {
+                container.innerHTML = `
+                    <p style="color:#10b981;font-weight:bold;margin:0 auto;margin-bottom:0.5rem;">💳 Full Payment - Click Confirm</p>
+                    <button class="btn btn-primary" onclick="confirmFullPayment()" style="flex:1;">✓ Confirm & Complete Deal</button>
+                `;
+            } else {
+                container.innerHTML = `
+                    <p style="color:#22d3ee;font-weight:bold;margin:0 auto;">💳 Payment 1 (Before Work) Proof - Confirm to Start Work</p>
+                    <button class="btn btn-primary" onclick="confirmPaymentReceived('${ticket.id}')" style="flex:1;">✓ Confirm Payment</button>
+                `;
+            }
+            break;
+        case 'CHANGES_REQUESTED':
+            container.innerHTML = `<p style="color:#f59e0b;font-weight:bold;margin:0 auto;">⚠️ Changes Requested - Waiting for Updated Work</p>`;
+            break;
+        case 'COMPLETED':
+            container.innerHTML = `<p style="color:#10b981;font-weight:bold;margin:0 auto;">✅ Deal Completed!</p>`;
+            break;
+        case 'REJECTED':
+        case 'CANCELLED':
+            container.innerHTML = `<p style="color:#ef4444;font-weight:bold;margin:0 auto;">✕ Deal ${ticket.status}</p>`;
+            break;
+        default:
+            container.innerHTML = `<p style="color:#f59e0b;font-weight:bold;margin:0 auto;">Status: ${ticket.status}</p>`;
+    }
+}
+
+// Counter Offer Functions
+window.showCounterOffer = function() {
+    document.getElementById('counter-modal').style.display = 'flex';
+    document.getElementById('counter-amount').value = '';
+    document.getElementById('counter-note').value = '';
+};
+
+window.closeCounterModal = function() {
+    document.getElementById('counter-modal').style.display = 'none';
+};
+
+window.submitCounterOfferFromModal = async function() {
+    const amount = document.getElementById('counter-amount').value.trim();
+    const note = document.getElementById('counter-note').value.trim();
+    
+    if (!amount || isNaN(amount)) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    closeCounterModal();
+    await submitBrandCounterOffer(amount, note);
+};
+
+async function submitBrandCounterOffer(amount, note) {
+    try {
+        const { error } = await insforge.database
+            .from('tickets')
+            .update({ 
+                status: 'NEGOTIATION',
+                proposed_amount: amount
+            })
+            .eq('id', currentTicket.id);
+        
+        if (error) throw error;
+        
+        await insforge.database.from('ticket_messages').insert([{
+            ticket_id: currentTicket.id,
+            sender_id: currentUser.id,
+            message: note ? `Counter offer: ₹${amount} - ${note}` : `Counter offer: ₹${amount}`
+        }]);
+        
+        alert('Counter offer sent!');
+        
+        await createNotification({
+            userId: currentTicket.influencer_id,
+            type: 'counter_offer',
+            message: `💰 Counter offer of ₹${amount} received`,
+            referenceId: currentTicket.id
+        });
+        
+        await loadDealDetails(currentTicket.id);
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+// Work Approval Functions
+window.approveWork = async function() {
+    if (!confirm('Approve this work and complete the deal?')) return;
+    
+    try {
+        const { error } = await insforge.database
+            .from('tickets')
+            .update({ status: 'COMPLETED' })
+            .eq('id', currentTicket.id);
+        
+        if (error) throw error;
+        
+        await createNotification({
+            userId: currentTicket.influencer_id,
+            type: 'work_approved',
+            message: `✅ Your work has been approved! Deal completed.`,
+            referenceId: currentTicket.id
+        });
+        
+        alert('Work approved! Deal completed.');
+        await loadDealDetails(currentTicket.id);
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+};
+
+window.showChangeRequest = function() {
+    document.getElementById('change-modal').style.display = 'flex';
+    document.getElementById('change-note').value = '';
+};
+
+window.closeChangeModal = function() {
+    document.getElementById('change-modal').style.display = 'none';
+};
+
+window.submitChangeRequest = async function() {
+    const note = document.getElementById('change-note').value.trim();
+    if (!note) {
+        alert('Please describe the changes needed');
+        return;
+    }
+    
+    closeChangeModal();
+    
+    try {
+        const { error } = await insforge.database
+            .from('tickets')
+            .update({ status: 'CHANGES_REQUESTED' })
+            .eq('id', currentTicket.id);
+        
+        if (error) throw error;
+        
+        await insforge.database.from('ticket_messages').insert([{
+            ticket_id: currentTicket.id,
+            sender_id: currentUser.id,
+            message: `⚠️ Changes requested: ${note}`
+        }]);
+        
+        await createNotification({
+            userId: currentTicket.influencer_id,
+            type: 'changes_requested',
+            message: `⚠️ Brand requested changes to your work`,
+            referenceId: currentTicket.id
+        });
+        
+        alert('Changes request sent!');
+        await loadDealDetails(currentTicket.id);
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+window.confirmFullPayment = async function() {
+    if (!confirm('Confirm full payment and complete this deal?')) return;
+    
+    try {
+        const { error } = await insforge.database
+            .from('tickets')
+            .update({ status: 'COMPLETED' })
+            .eq('id', currentTicket.id);
+        
+        if (error) throw error;
+        
+        await createNotification({
+            userId: currentTicket.influencer_id,
+            type: 'deal_completed',
+            message: `✅ Full payment confirmed! Deal completed.`,
+            referenceId: currentTicket.id
+        });
+        
+        alert('Deal completed!');
+        await loadDealDetails(currentTicket.id);
+    } catch (err) {
+        alert('Error: ' + err.message);
+    }
+}
+
+window.showPaymentSection = function() {
+    const section = document.getElementById('brand-payment-section');
+    if (section) {
+        section.style.display = 'block';
+        // Open expandale content
+        const content = section.querySelector('.expandable-content');
+        if (content) {
+            content.classList.add('show');
+            const toggle = section.querySelector('.expandable-toggle');
+            if (toggle) toggle.classList.add('open');
+        }
+        section.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+};

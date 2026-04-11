@@ -274,8 +274,42 @@
             <h1 id="deal-product" style="margin-bottom: 0.5rem;">Loading...</h1>
             <p class="subtitle" id="deal-influencer">Loading...</p>
             
-            <div class="action-buttons" id="action-buttons"></div>
+<div class="action-buttons" id="action-buttons"></div>
             
+            <!-- Counter Offer Modal -->
+            <div id="counter-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+                <div class="glass-panel" style="padding: 2rem; max-width: 400px; width: 90%;">
+                    <h2 class="mb-4">💰 Counter Offer</h2>
+                    <div class="mb-4">
+                        <label style="display: block; margin-bottom: 0.5rem;">Your Counter Offer Amount (₹)</label>
+                        <input type="number" id="counter-amount" class="input" placeholder="Enter amount" style="width: 100%;">
+                    </div>
+                    <div class="mb-4">
+                        <label style="display: block; margin-bottom: 0.5rem;">Note (optional)</label>
+                        <textarea id="counter-note" class="input" placeholder="Add a note..." rows="3" style="width: 100%;"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="closeCounterModal()" style="flex: 1;">Cancel</button>
+                        <button class="btn btn-primary" onclick="submitCounterOfferFromModal()" style="flex: 1;">Send Counter</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Change Request Modal -->
+            <div id="change-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+                <div class="glass-panel" style="padding: 2rem; max-width: 400px; width: 90%;">
+                    <h2 class="mb-4">⚠️ Request Changes</h2>
+                    <div class="mb-4">
+                        <label style="display: block; margin-bottom: 0.5rem;">Describe the changes needed</label>
+                        <textarea id="change-note" class="input" placeholder="Describe what needs to be changed..." rows="4" style="width: 100%;"></textarea>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="closeChangeModal()" style="flex: 1;">Cancel</button>
+                        <button class="btn btn-primary" onclick="submitChangeRequest()" style="flex: 1;">Send Request</button>
+                    </div>
+                </div>
+            </div>
+             
             <!-- Product Details Section -->
             <div class="expandable-section">
                 <div class="expandable-header" onclick="toggleSection(this)">
