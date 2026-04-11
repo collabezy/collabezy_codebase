@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Collabezy</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <style>
+      .notifications-dropdown {
+        position: absolute;
+        width: 320px;
+        max-height: 400px;
+        background: #1a1f2e;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        z-index: 9999;
+        overflow: hidden;
+        margin-top: 0.5rem;
+        right: 0;
+      }
+      .notifications-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        font-weight: 600;
+      }
+      .notifications-list { max-height: 350px; overflow-y: auto; }
+      .notification-item {
+        display: flex; gap: 0.75rem; padding: 0.75rem 1rem;
+        cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.2s;
+      }
+      .notification-item:hover { background: rgba(255,255,255,0.05); }
+      .notification-item.unread { background: rgba(139, 92, 246, 0.1); }
+      .notification-item.important { border-left: 3px solid #f59e0b; }
+      .notification-icon { font-size: 1.25rem; flex-shrink: 0; }
+      .notification-content { flex: 1; min-width: 0; }
+      .notification-message { font-size: 0.85rem; color: #e2e8f0; margin-bottom: 0.25rem; }
+      .notification-time { font-size: 0.7rem; color: #94a3b8; }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <h2 class="title" style="font-size: 1.25rem;">Collabezy</h2>
+        <ul class="sidebar-nav">
+          <li><a href="#" class="active">Overview</a></li>
+          <li><a href="/collab_requests.html">Collab Requests</a></li>
+          <li><a href="#channels-section">Channels</a></li>
+          <li><a href="#profile-form-container">Settings</a></li>
+          <li><a href="#" id="logout-btn">Logout</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <div class="flex-between mb-8">
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <img id="header-avatar" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid var(--primary);" />
+            <div>
+              <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;" id="welcome-text">Loading...</h1>
+              <p class="subtitle">Manage your profile and social channels</p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: flex-start; gap: 1rem; position: relative;">
+            <button class="btn btn-secondary" style="width: auto; padding: 0.75rem 1.5rem;" id="edit-profile-btn">Edit Profile</button>
+            <button id="notification-bell" onclick="toggleNotifications()" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); cursor: pointer; font-size: 1.25rem; padding: 0.5rem 0.75rem; border-radius: 8px; color: white; position: relative;">
+              🔔
+              <span id="notification-badge" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 10px; display: none;">0</span>
+            </button>
+            <div id="notifications-dropdown" class="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%;">
+              <div class="notifications-header">
+                <span>Notifications</span>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button onclick="markAllAsRead()" style="background: none; border: none; color: #8b5cf6; cursor: pointer; font-size: 0.75rem;">Mark all read</button>
+                  <button onclick="clearAllNotifications()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.75rem;">Clear all</button>
+                </div>
+              </div>
+              <div id="notifications-list" class="notifications-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="profile-banner" class="glass-panel mb-8" style="padding: 2rem;">
+            <div style="display: flex; gap: 2rem; align-items: center;">
+              <div>
+                <img id="prof-avatar" src="" alt="Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; display: none; border: 2px solid rgba(255,255,255,0.2); background: #1a2035;" />
+              </div>
+              <div style="flex: 1;">
+                <h2 id="prof-name"></h2>
+                <p id="prof-bio" class="subtitle mt-3 mb-3"></p>
+                
+                <div class="pill-list" id="prof-categories"></div>
+              </div>
+            </div>
+        </div>
+
+        <!-- Setup Profile Form (Hidden by default) -->
+        <div id="profile-form-container" class="glass-panel mb-8" style="display: none;">
+            <h3 class="mb-4">Setup Your Profile</h3>
+            <form id="profile-form">
+                <div class="form-group">
+                    <label>Profile Picture</label>
+                    <input type="file" id="avatar-upload" accept="image/*" class="input-field" style="padding: 0.5rem;" />
+                </div>
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="full-name" required />
+                </div>
+                <div class="form-group">
+                    <label>Bio</label>
+                    <input type="text" id="bio" />
+                </div>
+                <div class="form-group">
+                    <label>Categories (comma separated)</label>
+                    <input type="text" id="categories" placeholder="Tech, Lifestyle, Gaming" />
+                </div>
+                <div class="form-group">
+                    <label>Content Types (comma separated)</label>
+                    <input type="text" id="content-types" placeholder="YouTube, TikTok, Reels" />
+                </div>
+                <div class="form-group">
+                    <label>UPI ID (for receiving payments)</label>
+                    <input type="text" id="upi-id" placeholder="yourname@upi" />
+                    <p class="subtitle" style="font-size: 0.75rem; margin-top: 0.25rem;">Example: john@oksbi, john@okhdfcbank</p>
+                </div>
+                <div class="flex-between mt-4">
+                  <button type="button" id="cancel-profile-btn" class="btn btn-secondary" style="width: auto; padding: 0.75rem 1.5rem; display: none;">Cancel</button>
+                  <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.75rem 1.5rem;">Save Profile</button>
+                </div>
+            </form>
+            <p id="profile-msg" class="mt-4 text-center"></p>
+        </div>
+
+        <div id="analytics-section" class="mb-8" style="display: none;">
+        </div>
+
+        <div class="flex-between mb-4" id="channels-section" style="scroll-margin-top: 100px;">
+          <h2 style="font-size: 1.5rem;">Connected Channels</h2>
+          <button class="btn btn-primary" id="open-channel-form-btn" style="width: auto; padding: 0.5rem 1.5rem;">+ Add Channel</button>
+        </div>
+
+        <div id="channels-list" class="feature-grid mb-8">
+           <!-- Loaded dynamically -->
+        </div>
+
+        <div id="empty-channels" class="glass-panel mb-8" style="padding: 2rem; border-style: dashed; text-align: center;">
+            <p class="subtitle mb-4">No channels connected yet. Connect your channels to start collaborating with brands.</p>
+        </div>
+
+        <!-- Add Channel Block -->
+        <div id="channel-form-container" class="glass-panel mb-4" style="display: none;">
+            <h3 class="mb-4">Add New Channel</h3>
+            <form id="add-channel-form">
+                <div class="form-group">
+                    <label>Platform</label>
+                    <select id="channel-platform" class="input-field" required>
+                        <option value="youtube">YouTube</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="tiktok">TikTok</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Channel Name</label>
+                    <input type="text" id="channel-name" required placeholder="e.g. My Awesome Channel" class="input-field" />
+                </div>
+                <div class="form-group">
+                    <label>Channel Link</label>
+                    <input type="text" id="channel-link" required placeholder="https://youtube.com/..." class="input-field" />
+                </div>
+                <div class="flex-between mt-4">
+                  <button type="button" class="btn btn-secondary" id="close-channel-form-btn" style="width: auto; padding: 0.5rem 1.5rem;">Cancel</button>
+                  <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.5rem 1.5rem;">Save Channel</button>
+                </div>
+            </form>
+            <p id="channel-msg" class="mt-4 text-center"></p>
+        </div>
+      </main>
+    </div>
+
+    <script type="module" src="/src/dashboard.js"></script>
+    <script type="module">
+      import { initNotifications, stopNotificationPolling } from '/src/notifications.js';
+      initNotifications();
+    </script>
+  </body>
+</html>

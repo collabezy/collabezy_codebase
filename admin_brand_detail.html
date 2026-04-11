@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Details - Admin Console</title>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2 class="title" style="font-size: 1.25rem;">Admin Console</h2>
+            <p class="subtitle mb-6">System Administrator</p>
+            <ul class="sidebar-nav">
+                <li><a href="/admin_dashboard.html">← Back to Overview</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="loading" class="text-center" style="padding: 5rem;">
+                <p class="subtitle">Fetching brand details...</p>
+            </div>
+
+            <div id="content" style="display: none;">
+                <div class="glass-panel mb-8" style="padding: 2.5rem;">
+                    <div style="flex: 1;">
+                        <h1 id="brand-name" style="font-size: 2.2rem; margin-bottom: 0.5rem;">Loading...</h1>
+                        <p id="brand-email" class="subtitle mb-4">admin@collab.com</p>
+                        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                            <span id="brand-industry" class="pill" style="background: rgba(45, 212, 191, 0.1); border-color: #2dd4bf; color: #2dd4bf;">Industry</span>
+                            <a id="brand-website" target="_blank" class="subtitle" style="text-decoration: underline;">Visit Website</a>
+                        </div>
+                        <p id="brand-description" class="subtitle" style="max-width: 700px; line-height: 1.6;"></p>
+                    </div>
+                </div>
+
+                <h2 class="mb-4">Campaign History</h2>
+                <div id="campaign-list" class="feature-grid">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/admin_brand_detail.js"></script>
+</body>
+</html>

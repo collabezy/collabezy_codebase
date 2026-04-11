@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Dashboard - Collabezy</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <style>
+        .notifications-dropdown {
+            position: absolute;
+            width: 320px;
+            max-height: 400px;
+            background: #1a1f2e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            z-index: 9999;
+            overflow: hidden;
+            margin-top: 0.5rem;
+            right: 0;
+        }
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+        }
+        .notifications-list { max-height: 350px; overflow-y: auto; }
+        .notification-item {
+            display: flex; gap: 0.75rem; padding: 0.75rem 1rem;
+            cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.2s;
+        }
+        .notification-item:hover { background: rgba(255,255,255,0.05); }
+        .notification-item.unread { background: rgba(139, 92, 246, 0.1); }
+        .notification-item.important { border-left: 3px solid #f59e0b; }
+        .notification-icon { font-size: 1.25rem; flex-shrink: 0; }
+        .notification-content { flex: 1; min-width: 0; }
+        .notification-message { font-size: 0.85rem; color: #e2e8f0; margin-bottom: 0.25rem; }
+        .notification-time { font-size: 0.7rem; color: #94a3b8; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2 class="title" style="font-size: 1.25rem;">Collabezy</h2>
+            <p class="subtitle mb-4 text-center" style="font-size: 0.8rem; background: rgba(236,72,153,0.1); color: #ec4899; padding: 0.25rem; border-radius: 4px;">BRAND PORTAL</p>
+            <ul class="sidebar-nav">
+                <li><a href="#" class="active" id="nav-overview">Overview</a></li>
+                <li><a href="/discover.html" id="nav-discover">Discover Influencers</a></li>
+                <li><a href="#promotion-creator" id="nav-campaigns">New Promotion</a></li>
+                <li><a href="#promotion-list" id="nav-list">My Promotions</a></li>
+                <li><a href="/brand_requests.html" id="nav-deals">Active Deals</a></li>
+                <li><a href="#" id="logout-btn">Logout</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="flex-between mb-8">
+                <div>
+                    <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;" id="welcome-text">Loading Dashboard...</h1>
+                    <p class="subtitle" id="brand-status">Manage your promotion requests</p>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 1rem; position: relative;">
+                    <button id="show-campaign-form-btn" class="btn btn-primary" style="width: auto; padding: 0.75rem 1.5rem;">+ Promote My Product</button>
+                    <a href="/" class="btn btn-secondary" style="width: auto; padding: 0.75rem 1.5rem;">Website</a>
+                    <button id="notification-bell" onclick="toggleNotifications()" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); cursor: pointer; font-size: 1.25rem; padding: 0.5rem 0.75rem; border-radius: 8px; color: white; position: relative;">
+                        🔔
+                        <span id="notification-badge" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.65rem; padding: 0.15rem 0.4rem; border-radius: 10px; display: none;">0</span>
+                    </button>
+                    <div id="notifications-dropdown" class="notifications-dropdown" style="display: none; position: absolute; right: 0; top: 100%;">
+                        <div class="notifications-header">
+                            <span>Notifications</span>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button onclick="markAllAsRead()" style="background: none; border: none; color: #8b5cf6; cursor: pointer; font-size: 0.75rem;">Mark all read</button>
+                                <button onclick="clearAllNotifications()" style="background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.75rem;">Clear all</button>
+                            </div>
+                        </div>
+                        <div id="notifications-list" class="notifications-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Promotion Stats Summary -->
+            <div class="feature-grid mb-8">
+                <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                    <p class="subtitle">Active Promotions</p>
+                    <h2 id="active-count" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
+                </div>
+                <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                    <p class="subtitle">Drafts</p>
+                    <h2 id="draft-count" style="font-size: 2rem; margin-top: 0.5rem;">0</h2>
+                </div>
+                <div class="glass-panel" style="padding: 1.5rem; text-align: center;">
+                    <p class="subtitle">Total Collaborations</p>
+                    <h2 style="font-size: 2rem; margin-top: 0.5rem;">Coming soon</h2>
+                </div>
+            </div>
+
+            <!-- Promotion Creator Form (Hidden by default) -->
+            <div id="promotion-creator" class="glass-panel mb-8" style="padding: 2rem; scroll-margin-top: 100px; display: none;">
+                <h2 class="mb-4">Create Promotion Request</h2>
+                <form id="campaign-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" id="product-name" placeholder="e.g. Acme Air Headphones" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Budget Range</label>
+                            <input type="text" id="budget" placeholder="e.g. ₹50k - ₹1L" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mt-4">
+                        <label>Description</label>
+                        <textarea id="campaign-description" rows="3" placeholder="Describe what you're looking for from influencers..." required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;"></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
+                        <div class="form-group">
+                            <label>Platform(s)</label>
+                            <div id="platform-checkboxes" style="display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+                                <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                                    <input type="checkbox" name="platform" value="youtube" style="width: auto;"> YouTube
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                                    <input type="checkbox" name="platform" value="instagram" style="width: auto;"> Instagram
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                                    <input type="checkbox" name="platform" value="tiktok" style="width: auto;"> TikTok
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
+                                    <input type="checkbox" name="platform" value="any" style="width: auto;"> Any
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Deadline</label>
+                            <input type="date" id="deadline" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                        </div>
+                    </div>
+
+                    <div class="flex-between mt-6">
+                        <div style="display: flex; gap: 1rem; align-items: center;">
+                            <button type="submit" id="save-campaign-btn" class="btn btn-primary" style="width: auto; padding: 0.75rem 2rem;">Create Promotion Request</button>
+                            <button type="button" id="cancel-campaign-btn" class="btn btn-secondary" style="width: auto; padding: 0.75rem 2rem;">Cancel</button>
+                        </div>
+                        <p id="campaign-msg" class="subtitle" style="display: none;"></p>
+                    </div>
+                </form>
+            </div>
+
+            <!-- My Promotion Requests List -->
+            <div id="promotion-list" class="glass-panel" style="padding: 2rem; scroll-margin-top: 100px;">
+                <h2 class="mb-6">My Promotion Requests</h2>
+                <div id="campaigns-container">
+                    <p class="subtitle text-center">No promotion requests created yet.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/brand_dashboard.js"></script>
+    <script type="module">
+        import { initNotifications, stopNotificationPolling } from '/src/notifications.js';
+        initNotifications();
+    </script>
+</body>
+</html>
