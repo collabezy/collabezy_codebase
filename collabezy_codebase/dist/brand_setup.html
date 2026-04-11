@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brand Setup - Influencer Brand Collab</title>
+  <script type="module" crossorigin src="/assets/brand_setup-CDNDVWPL.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/insforge-gvpOEqFn.js">
+  <link rel="modulepreload" crossorigin href="/assets/style-BMUfA7TY.js">
+  <link rel="stylesheet" crossorigin href="/assets/style-CO-q1XwB.css">
+</head>
+<body>
+  <div class="dashboard-layout" style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
+    <div class="glass-panel" style="width: 100%; max-width: 600px; padding: 2.5rem;">
+      <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Complete Brand Profile</h1>
+      <p class="subtitle mb-8">Tell us about your brand to start creating campaigns.</p>
+
+      <form id="brand-setup-form">
+        <div class="form-group">
+          <label>Brand Name</label>
+          <input type="text" id="brand-name" placeholder="e.g. Acme Corp" required>
+        </div>
+        <div class="form-group">
+          <label>Website</label>
+          <input type="text" id="website" placeholder="e.g. youtube.com" required>
+        </div>
+        <div class="form-group">
+          <label>Industry</label>
+          <select id="industry" class="input-field" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+            <option value="">Select an industry</option>
+            <option value="Fashion">Fashion</option>
+            <option value="Technology">Technology</option>
+            <option value="Beauty">Beauty</option>
+            <option value="Fitness">Fitness</option>
+            <option value="Food & Beverage">Food & Beverage</option>
+            <option value="Travel">Travel</option>
+            <option value="Gaming">Gaming</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Brand Description</label>
+          <textarea id="description" rows="4" placeholder="Tell influencers what your brand is about..." required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;"></textarea>
+        </div>
+        
+        <div id="setup-message" class="mt-4 mb-4 text-center" style="display: none;"></div>
+        
+        <button type="submit" id="submit-btn" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Complete Setup</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

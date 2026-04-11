@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencer Details - Admin Console</title>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar (Shared with Dashboard) -->
+        <aside class="sidebar">
+            <h2 class="title" style="font-size: 1.25rem;">Admin Console</h2>
+            <p class="subtitle mb-6">System Administrator</p>
+            <ul class="sidebar-nav">
+                <li><a href="/admin_dashboard.html">← Back to Overview</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div id="loading" class="text-center" style="padding: 5rem;">
+                <p class="subtitle">Fetching profile details...</p>
+            </div>
+
+            <div id="content" style="display: none;">
+                <div class="glass-panel mb-8" style="padding: 2.5rem;">
+                    <div style="display: flex; gap: 2rem; align-items: start;">
+                        <img id="avatar" src="" alt="Influencer Avatar" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; background: #1a2035; border: 2px solid rgba(255,255,255,0.1);">
+                        <div style="flex: 1;">
+                            <h1 id="inf-name" style="font-size: 2.2rem; margin-bottom: 0.5rem;">Loading...</h1>
+                            <p id="inf-email" class="subtitle mb-4">admin@collab.com</p>
+                            <div id="inf-categories" class="pill-list mb-4"></div>
+                            <p id="inf-bio" class="subtitle" style="max-width: 600px; line-height: 1.6;"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="mb-4">Linked Social Accounts</h2>
+                <div id="channels-list" class="feature-grid">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/admin_influencer_detail.js"></script>
+</body>
+</html>
