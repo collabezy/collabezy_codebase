@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Email - Collabezy</title>
+  <link rel="icon" type="image/png" href="./cezy2-1.png">
+  <style>
+    .verify-container {
+      max-width: 400px;
+      margin: 4rem auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    .otp-inputs {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin: 2rem 0;
+    }
+    .otp-input {
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      text-align: center;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      color: var(--text-main);
+      outline: none;
+    }
+    .otp-input:focus {
+      border-color: var(--primary);
+    }
+    .resend-link {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 1rem;
+    }
+    .resend-link a {
+      color: var(--primary);
+      cursor: pointer;
+    }
+  </style>
+  <script type="module" crossorigin src="./assets/verify_email-B-M23K6X.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/insforge-D28RsFYD.js">
+  <link rel="modulepreload" crossorigin href="./assets/style-BqVZ4CSq.js">
+  <link rel="stylesheet" crossorigin href="./assets/style-CJaI28KQ.css">
+</head>
+<body>
+  <nav class="navbar glass-panel">
+    <div class="nav-content">
+      <a href="/" class="title small-title">Collabezy</a>
+    </div>
+  </nav>
+
+  <div class="glass-panel verify-container">
+    <h1 class="mb-4">Verify Your Email</h1>
+    <p class="subtitle mb-4">We've sent a verification code to<br><strong id="user-email"></strong></p>
+    
+    <div class="otp-inputs">
+      <input type="text" class="otp-input" maxlength="1" id="otp1" autofocus>
+      <input type="text" class="otp-input" maxlength="1" id="otp2">
+      <input type="text" class="otp-input" maxlength="1" id="otp3">
+      <input type="text" class="otp-input" maxlength="1" id="otp4">
+      <input type="text" class="otp-input" maxlength="1" id="otp5">
+      <input type="text" class="otp-input" maxlength="1" id="otp6">
+    </div>
+    
+    <button class="btn btn-primary" style="width: 100%;" id="verify-btn">Verify Email</button>
+    
+    <p class="resend-link">Didn't receive the code? <a id="resend-btn">Resend</a></p>
+    
+    <p id="message" class="mt-4" style="display: none;"></p>
+  </div>
+
+</body>
+</html>
