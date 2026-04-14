@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - Collabezy</title>
-    <link rel="icon" type="image/png" href="/cezy2-1.png" />
-    <link rel="stylesheet" href="/src/style.css" />
+    <link rel="icon" type="image/png" href="./cezy2-1.png" />
     <style>
       .notifications-dropdown {
         position: absolute;
@@ -42,6 +41,12 @@
       .notification-message { font-size: 0.85rem; color: #e2e8f0; margin-bottom: 0.25rem; }
       .notification-time { font-size: 0.7rem; color: #94a3b8; }
     </style>
+    <script type="module" crossorigin src="./assets/dashboard-1XM4iZaK.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/insforge-D28RsFYD.js">
+    <link rel="modulepreload" crossorigin href="./assets/style-CAvnQPbK.js">
+    <link rel="modulepreload" crossorigin href="./assets/analytics-8ww5WDR9.js">
+    <link rel="modulepreload" crossorigin href="./assets/notifications-C9WghsGK.js">
+    <link rel="stylesheet" crossorigin href="./assets/style-D5311d6m.css">
   </head>
   <body>
     <div class="dashboard-layout">
@@ -51,6 +56,7 @@
         <ul class="sidebar-nav">
           <li><a href="#" class="active">Overview</a></li>
           <li><a href="/collab_requests.html">Collab Requests</a></li>
+          <li><a href="/discover_opportunities.html">Opportunities</a></li>
           <li><a href="#channels-section">Channels</a></li>
           <li><a href="#profile-form-container">Settings</a></li>
           <li><a href="#" id="logout-btn">Logout</a></li>
@@ -129,6 +135,10 @@
                     <input type="text" id="upi-id" placeholder="yourname@upi" />
                     <p class="subtitle" style="font-size: 0.75rem; margin-top: 0.25rem;">Example: john@oksbi, john@okhdfcbank</p>
                 </div>
+                <div class="form-group mt-4">
+                    <label>Delivery Address (for product exchange collabs)</label>
+                    <textarea id="delivery-address" rows="2" placeholder="Enter your full delivery address for receiving products" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;"></textarea>
+                </div>
                 <div class="flex-between mt-4">
                   <button type="button" id="cancel-profile-btn" class="btn btn-secondary" style="width: auto; padding: 0.75rem 1.5rem; display: none;">Cancel</button>
                   <button type="submit" class="btn btn-primary" style="width: auto; padding: 0.75rem 1.5rem;">Save Profile</button>
@@ -183,10 +193,5 @@
       </main>
     </div>
 
-    <script type="module" src="/src/dashboard.js"></script>
-    <script type="module">
-      import { initNotifications, stopNotificationPolling } from '/src/notifications.js';
-      initNotifications();
-    </script>
   </body>
 </html>

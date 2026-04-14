@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Brand Dashboard - Collabezy</title>
-    <link rel="icon" type="image/png" href="/cezy2-1.png">
-    <link rel="stylesheet" href="/src/style.css">
+    <link rel="icon" type="image/png" href="./cezy2-1.png">
     <style>
         .notifications-dropdown {
             position: absolute;
@@ -42,6 +41,11 @@
         .notification-message { font-size: 0.85rem; color: #e2e8f0; margin-bottom: 0.25rem; }
         .notification-time { font-size: 0.7rem; color: #94a3b8; }
     </style>
+  <script type="module" crossorigin src="./assets/brand_dashboard-D7ZYcz6R.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/insforge-D28RsFYD.js">
+  <link rel="modulepreload" crossorigin href="./assets/style-CAvnQPbK.js">
+  <link rel="modulepreload" crossorigin href="./assets/notifications-C9WghsGK.js">
+  <link rel="stylesheet" crossorigin href="./assets/style-D5311d6m.css">
 </head>
 <body>
     <div class="dashboard-layout">
@@ -112,8 +116,11 @@
                             <input type="text" id="product-name" placeholder="e.g. Acme Air Headphones" required>
                         </div>
                         <div class="form-group">
-                            <label>Budget Range</label>
-                            <input type="text" id="budget" placeholder="e.g. ₹50k - ₹1L" required>
+                            <label>Collaboration Type</label>
+                            <select id="collab-type" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                                <option value="paid" selected>Paid Collab (Pay influencer)</option>
+                                <option value="product_exchange">Product Exchange (Free product)</option>
+                            </select>
                         </div>
                     </div>
                     
@@ -123,7 +130,7 @@
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 1rem;">
-                        <div class="form-group">
+                        <div class="form-group" style="grid-column: span 2;">
                             <label>Platform(s)</label>
                             <div id="platform-checkboxes" style="display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
                                 <label style="display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; cursor: pointer;">
@@ -141,9 +148,21 @@
                             </div>
                         </div>
                         <div class="form-group">
+                            <label>Budget (₹)</label>
+                            <input type="number" id="budget" placeholder="e.g. 10000" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
+                        </div>
+                        <div class="form-group">
                             <label>Deadline</label>
                             <input type="date" id="deadline" required style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 8px;">
                         </div>
+                    </div>
+
+                    <div class="form-group mt-4">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="is-public" style="width: auto;">
+                            <span>Make this public (visible to influencers)</span>
+                        </label>
+                        <p class="subtitle mt-1" style="font-size: 0.8rem;">Influencers can discover and apply to public promotion requests</p>
                     </div>
 
                     <div class="flex-between mt-6">
@@ -163,13 +182,19 @@
                     <p class="subtitle text-center">No promotion requests created yet.</p>
                 </div>
             </div>
+
+            <!-- Applicants Modal -->
+            <div id="applicants-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+                <div class="glass-panel" style="padding: 2rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+                    <div class="flex-between mb-4">
+                        <h2>Applicants</h2>
+                        <button onclick="closeApplicantsModal()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+                    </div>
+                    <div id="applicants-list"></div>
+                </div>
+            </div>
         </main>
     </div>
 
-    <script type="module" src="/src/brand_dashboard.js"></script>
-    <script type="module">
-        import { initNotifications, stopNotificationPolling } from '/src/notifications.js';
-        initNotifications();
-    </script>
 </body>
 </html>
